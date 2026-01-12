@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Leave Management</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+    {% if session.user_id %}
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="brand">
+            <i class="fas fa-graduation-cap"></i> CMS
+        </div>
+        <a href="{{ url_for('dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
+
+        {% if session.role == 'student' %}
+        <a href="#applyLeaveModal" data-bs-toggle="modal"><i class="fas fa-plus-circle me-2"></i> Apply Leave</a>
+        {% endif %}
+
+        {% if session.role == 'admin' %}
+        <a href="#addUserModal" data-bs-toggle="modal"><i class="fas fa-user-plus me-2"></i> Add User</a>
+        {% endif %}
+
+        <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+    </div>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-light bg-white mb-4 shadow-sm rounded">
+            <div class="container-fluid">
+                <!-- Toggle Button -->
+                <button class="btn btn-outline-primary d-md-none me-3" id="sidebarCollapse">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <span class="navbar-brand mb-0 h1 text-primary">
+                    {% block title %}Dashboard{% endblock %}
+                </span>
+                <div class="d-flex align-items-center">
+                    <span class="me-3 text-muted d-none d-md-block">Welcome, <strong>{{ session.full_name }}</strong>
+                        ({{ session.role|capitalize }})</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(category_filter=["success", "danger", "warning"]) %}
+        {% if messages %}
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+    {% else %}
+    <!-- Full width for login page -->
+    {% block login_content %}{% endblock %}
+    {% endif %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const sidebarBtn = document.getElementById('sidebarCollapse');
+
+            if (sidebarBtn) {
+                sidebarBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', function () {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
